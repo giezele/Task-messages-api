@@ -4,20 +4,48 @@ namespace App\Http\Controllers;
 
 use App\Models\Task;
 use Illuminate\Http\Request;
+use League\Fractal\Manager;
+use League\Fractal\Resource\Collection;
+use App\Transformers\TaskTransformer;
+use League\Fractal\Pagination\IlluminatePaginatorAdapter;
+use Illuminate\Database\Eloquent\Builder;
 
 class TaskController extends Controller
 {
+    /**
+     * @var Manager
+     */
+    private $fractal;
+
+    /**
+     * @var TaskTransformer
+     */
+    private $taskTransformer;
+
+    function __construct(Manager $fractal, TaskTransformer $taskTransformer)
+    {
+        $this->fractal = $fractal;
+        $this->taskTransformer = $taskTransformer;
+    }
+
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        // $task = Task::all();
-        $task = Task::with('user')->orderBy('id')->get();
+        // $tasks = Task::all();
+        // $tasks = Task::with('user')->orderBy('id')->get();
+        $tasksPaginator = Task::paginate(10);
 
-        return $task;
+        $tasks = new Collection($tasksPaginator->items(), $this->taskTransformer);
+        $tasks->setPaginator(new IlluminatePaginatorAdapter($tasksPaginator));
+
+        $this->fractal->parseIncludes($request->get('include', '')); // parse includes
+        $tasks = $this->fractal->createData($tasks); // Transform data
+
+        return $tasks->toArray();
     }
 
     /**

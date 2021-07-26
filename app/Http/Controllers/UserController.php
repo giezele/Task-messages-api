@@ -3,17 +3,52 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\User;
+use League\Fractal\Manager;
+use League\Fractal\Resource\Collection;
+use League\Fractal\Resource\Item;
+use App\Transformers\UserTransformer;
+use League\Fractal\Pagination\IlluminatePaginatorAdapter;
+use Illuminate\Database\Eloquent\Builder;
 
 class UserController extends Controller
 {
+    /**
+     * @var Manager
+     */
+    private $fractal;
+
+    /**
+     * @var UserTransformer
+     */
+    private $userTransformer;
+
+    function __construct(Manager $fractal, UserTransformer $userTransformer)
+    {
+        $this->fractal = $fractal;
+        $this->userTransformer = $userTransformer;
+    }
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
+        $paginator = User::paginate(10);
+
+        // $users = User::all(); // Get users from DB
+        // $users = new Collection($users, $this->userTransformer); // Create a resource collection transformer
+        $users = new Collection($paginator->items(), $this->userTransformer);
+        $users->setPaginator(new IlluminatePaginatorAdapter($paginator));
+        
+        $this->fractal->parseIncludes($request->get('include', '')); // parse includes
+        $users = $this->fractal->createData($users); // Transform data
+
+        return $users->toArray(); // Get transformed array of data
+
+        // $users = User::all()->transformWith(new UserTransformer())->toArray();
+        // return $users;
     }
 
     /**
@@ -33,9 +68,14 @@ class UserController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show(Request $request, $id)
     {
-        //
+        $user = User::find($id);
+        $user = new Item($user, $this->userTransformer);
+        $this->fractal->parseIncludes($request->get('include', '')); // parse includes
+        $user = $this->fractal->createData($user); 
+
+        return $user->toArray(); 
     }
 
     /**

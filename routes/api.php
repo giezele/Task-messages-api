@@ -1,9 +1,11 @@
 <?php
 
-use App\Http\Controllers\TaskController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\TaskController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\UserController;
+
 
 
 /*
@@ -31,6 +33,8 @@ Route::group([
 
 Route::group(['middleware' => 'auth:api'], function() {
     Route::apiResource('tasks', TaskController::class);
+    Route::apiResource('users', UserController::class);
+
 });
 
 
