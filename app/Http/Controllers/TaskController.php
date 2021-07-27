@@ -142,5 +142,20 @@ class TaskController extends Controller
         return response()->json($response, 201);
     }
 
+    public function changeTaskStatus(Request $request, Task $task)
+    {
+        $this->authorize('update', $task);
+        $task->status = $request->get('status', $task->status);
+        $task->save();
+     
+        $response = fractal()	
+            ->item($task)
+            ->transformWith(new TaskTransformer)
+            ->includeUser()
+            ->toArray();
+     
+        return response()->json($response, 200);
+    }
+
     
 }
