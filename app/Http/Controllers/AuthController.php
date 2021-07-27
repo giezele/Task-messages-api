@@ -5,6 +5,7 @@ use Illuminate\Http\Request;
 
 use Illuminate\Support\Facades\Auth;
 use App\Models\User;
+use App\Transformers\UserTransformer;
 use Validator;
 
 
@@ -66,6 +67,12 @@ class AuthController extends Controller
             'message' => 'User successfully registered',
             'user' => $user
         ], 201);
+        // $response = fractal()
+        //     ->item($user)
+        //     ->transformWith(new UserTransformer)
+        //     ->toArray();
+
+        // return response()->json($response, 201);
     }
 
 

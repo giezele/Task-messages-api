@@ -121,24 +121,25 @@ class TaskController extends Controller
                 response()->json(['error' => 'deleting from database was not successful'], 500)  ;
     }
 
-    public function add(Request $request, Task $task){
-        // $this->validate($request,[
-        //     'name' => 'required|min:2'
-        // ]);
+    public function addTask(Request $request, Task $task){
+        $this->validate($request,[
+            'name' => 'required|min:2'
+        ]);
      
         $task->create([
             'name' => $request->name,
-            'user_id' => Auth::user()->id,
+            'description' => $request->description,
+            'type'=> $request->type,
+            'status'=> $request->status,
+            'user_id' => auth()->user()->id,
         ]);
      
-        // $task = Fractal::create($task, new TaskTransformer())->toArray();
         $response = fractal()
             ->item($task)
             ->transformWith(new TaskTransformer)
             ->toArray();
      
-        return $task;
-        // return response()->json($response, 201);
+        return response()->json($response, 201);
     }
 
     

@@ -11,6 +11,8 @@ use App\Transformers\UserTransformer;
 use League\Fractal\Pagination\IlluminatePaginatorAdapter;
 use Illuminate\Database\Eloquent\Builder;
 use Spatie\Fractal\Fractal;
+use Illuminate\Support\Facades\Auth;
+
 
 class UserController extends Controller
 {
@@ -102,13 +104,23 @@ class UserController extends Controller
         //
     }
 
-    // public function users(User $user)
-    // {
-    //     $users = $user->all();
- 
-    // 	return fractal()
-    // 		->collection($users)
-    // 		->transformWith(new UserTransformer)
-    // 		->toArray();
-    // }
+    public function usersAll(User $user)
+    {
+        $users = $user->all();
+
+        return fractal()
+    		->collection($users)
+    		->transformWith(new UserTransformer)
+    		->toArray();
+    }
+
+    public function userOwnTasks(User $user){
+        $user = $user->find(Auth::user()->id);
+     
+        return fractal()
+            ->item($user)
+            ->transformWith(new UserTransformer)
+            ->includeTasks()
+            ->toArray();
+    }
 }

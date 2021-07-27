@@ -34,6 +34,7 @@ class TaskTransformer extends TransformerAbstract
     public function transform(Task $task)
     {
         return [
+            'id' => $task->id,
             'name' => $task->name,
             'description'=> $task->description,
             'type'=> $task->type,

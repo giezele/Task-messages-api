@@ -35,28 +35,30 @@ class UserTransformer extends TransformerAbstract
     public function transform(User $user)
     {
         return [
+            'id' =>$user->id,
             'name' => $user->name,
             'email' => $user->email
         ];
     }
 
-    // public function includeTasks(User $user, ParamBag $paramBag)
-    // {
-    //     if (!$user->task) {
-    //         return null;
-    //     }
-
-    //     // return $this->item($user->tasks, App::make(TaskTransformer::class));//for 1 task
-    //     return $this->collection($user->tasks, App::make(TaskTransformer::class));
-
-    // }
-
     public function includeTasks(User $user, ParamBag $paramBag)
     {
-        list($orderCol, $orderBy) = $paramBag->get('order') ?: ['created_at', 'desc'];
+        if (!$user->task) {
+            return null;
+        }
 
-        $tasks = $user->tasks()->orderBy($orderCol, $orderBy)->get();
+        $tasks = $user->tasks;
+        // return $this->item($user->tasks, App::make(TaskTransformer::class));//for 1 task
+        return $this->collection($tasks, new TaskTransformer);
 
-        return $this->collection($tasks, App::make(TaskTransformer::class));
     }
+
+    // public function includeTasks(User $user, ParamBag $paramBag)
+    // {
+    //     list($orderCol, $orderBy) = $paramBag->get('order') ?: ['created_at', 'desc'];
+
+    //     $tasks = $user->tasks()->orderBy($orderCol, $orderBy)->get();
+
+    //     return $this->collection($tasks, App::make(TaskTransformer::class));
+    // }
 }
