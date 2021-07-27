@@ -111,6 +111,7 @@ class UserController extends Controller
         return fractal()
     		->collection($users)
     		->transformWith(new UserTransformer)
+            ->includeTasks()
     		->toArray();
     }
 
