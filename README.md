@@ -1,5 +1,7 @@
+This application is currently work in progress (WIP)
+
 # Task-messages API
-This is a repository for Laravel project of Task manager API.
+A simple Laravel application to allow users manage their tasks. Tasks can have messages attached to them. The scope of this app is API only.
 
 ## Usage
 

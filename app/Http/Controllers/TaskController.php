@@ -9,6 +9,9 @@ use League\Fractal\Resource\Collection;
 use App\Transformers\TaskTransformer;
 use League\Fractal\Pagination\IlluminatePaginatorAdapter;
 use Illuminate\Database\Eloquent\Builder;
+use Spatie\Fractal\Fractal;
+use Illuminate\Support\Facades\Auth;
+
 
 class TaskController extends Controller
 {
@@ -78,9 +81,12 @@ class TaskController extends Controller
      * @param  \App\Models\Task  $task
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show($task)
     {
-        return response()->json(Task::find($id), 200);
+        // $task = fractal()->item($task)->transformWith(new TaskTransformer())->includeUser()->toArray();
+
+        // return fractal($task, new TaskTransformer())->respond();
+        return response()->json(Task::find($task), 200);
     }
 
     /**
@@ -90,11 +96,11 @@ class TaskController extends Controller
      * @param  \App\Models\Task  $task
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, $task)
     {
-        // $this->authorize('update', $task);
+        $this->authorize('update', $task);
 
-        $task = Task::find($id);
+        $task = Task::find($task);
 
         $task->update($request->all());
         return $task;
@@ -114,4 +120,26 @@ class TaskController extends Controller
                 response()->json(['success' => 'success'], 200) : 
                 response()->json(['error' => 'deleting from database was not successful'], 500)  ;
     }
+
+    public function add(Request $request, Task $task){
+        // $this->validate($request,[
+        //     'name' => 'required|min:2'
+        // ]);
+     
+        $task->create([
+            'name' => $request->name,
+            'user_id' => Auth::user()->id,
+        ]);
+     
+        // $task = Fractal::create($task, new TaskTransformer())->toArray();
+        $response = fractal()
+            ->item($task)
+            ->transformWith(new TaskTransformer)
+            ->toArray();
+     
+        return $task;
+        // return response()->json($response, 201);
+    }
+
+    
 }

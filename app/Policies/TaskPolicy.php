@@ -53,7 +53,7 @@ class TaskPolicy
      */
     public function update(User $user, Task $task)
     {
-        return $user->is_admin || (auth()->check() && $task->user_id == auth()->id());
+        return $user->is_admin || $task->user_id == auth()->id();
     }
 
     /**

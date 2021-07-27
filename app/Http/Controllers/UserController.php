@@ -10,6 +10,7 @@ use League\Fractal\Resource\Item;
 use App\Transformers\UserTransformer;
 use League\Fractal\Pagination\IlluminatePaginatorAdapter;
 use Illuminate\Database\Eloquent\Builder;
+use Spatie\Fractal\Fractal;
 
 class UserController extends Controller
 {
@@ -100,4 +101,14 @@ class UserController extends Controller
     {
         //
     }
+
+    // public function users(User $user)
+    // {
+    //     $users = $user->all();
+ 
+    // 	return fractal()
+    // 		->collection($users)
+    // 		->transformWith(new UserTransformer)
+    // 		->toArray();
+    // }
 }
