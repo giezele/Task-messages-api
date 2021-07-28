@@ -30,7 +30,7 @@ class TaskPolicy
      */
     public function view(User $user, Task $task)
     {
-        //
+        return $task->user_id == auth()->id() || $task->assignee_id == $user->id;
     }
 
     /**
@@ -41,7 +41,7 @@ class TaskPolicy
      */
     public function create(User $user)
     {
-        return $user->is_admin;
+        // return $user->is_admin;
     }
 
     /**
@@ -53,7 +53,8 @@ class TaskPolicy
      */
     public function update(User $user, Task $task)
     {
-        return $user->is_admin || $task->user_id == auth()->id();
+        // return $user->is_admin || $task->user_id == auth()->id();
+        return $task->user_id == $user->id;
     }
 
     /**
@@ -65,7 +66,7 @@ class TaskPolicy
      */
     public function delete(User $user, Task $task)
     {
-        return $user->is_admin;
+        return $task->user_id == $user->id;
     }
 
     /**

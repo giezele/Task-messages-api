@@ -67,12 +67,7 @@ class AuthController extends Controller
             'message' => 'User successfully registered',
             'user' => $user
         ], 201);
-        // $response = fractal()
-        //     ->item($user)
-        //     ->transformWith(new UserTransformer)
-        //     ->toArray();
-
-        // return response()->json($response, 201);
+    
     }
 
 

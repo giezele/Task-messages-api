@@ -1,0 +1,43 @@
+Register
+POST api/auth/register
+{
+    "user": {
+        "name"
+        "email"
+        "password"
+        "password_confirmation"
+    }
+    
+}
+
+Login
+POST  api/auth/login
+{
+    "user": {
+        "email": 
+        "password": 
+  }
+}
+
+Create a task
+POST /api/add-task
+Constraints: Authenticated users
+{
+  "tasks": {
+    "id": 
+    "name": "title of task",
+    "description": "description of task",
+    "type": "basic",
+    "status" "todo",
+    "user_id": 
+    "assignee_id": , 
+  }
+}
+
+View a task
+GET /api/tasks/{task}
+Constraints: Authenticated and Authorized[Policy]
+Authorized means you are either the owner (user that created the task), or task is assigned to you
+{
+
+}

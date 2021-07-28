@@ -26,7 +26,8 @@ class UserTransformer extends TransformerAbstract
      * @var array
      */
     protected $availableIncludes = [
-        'tasks'
+        'tasks',
+        'assigned_tasks'
     ];
     
     /**
@@ -43,22 +44,18 @@ class UserTransformer extends TransformerAbstract
         ];
     }
 
-    // public function includeTasks(User $user, ParamBag $paramBag)
-    // {
-    //     if (!$user->task) {
-    //         return null;
-    //     }
-
-    //     $tasks = $user->tasks;
-    //     // return $this->item($user->tasks, App::make(TaskTransformer::class));//for 1 task
-    //     return $this->collection($tasks, new TaskTransformer);
-
-    // }
 
     public function includeTasks(User $user, ParamBag $paramBag)
     {
         $tasks = $user->tasks()->get();
 
         return $this->collection($tasks, App::make(TaskTransformer::class));
+    }
+
+    public function includeAssignedTasks(User $user, ParamBag $paramBag)
+    {
+        $assignedTasks = $user->assigned_tasks()->get();
+
+        return $this->collection($assignedTasks, App::make(TaskTransformer::class));
     }
 }

@@ -112,6 +112,7 @@ class UserController extends Controller
     		->collection($users)
     		->transformWith(new UserTransformer)
             ->includeTasks()
+            ->includeAssignedTasks()
     		->toArray();
     }
 

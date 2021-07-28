@@ -59,7 +59,7 @@ class TaskController extends Controller
      */
     public function store(Request $request, Task $task)
     {
-        $this->authorize('create', Task::class);
+        // $this->authorize('update', Task::class);
 
         $this->validate($request, [
             'name' => 'required|string|max:255',
@@ -93,10 +93,17 @@ class TaskController extends Controller
      */
     public function show($task)
     {
-        // $task = fractal()->item($task)->transformWith(new TaskTransformer())->includeUser()->toArray();
+        // $this->authorize('view', $task);
 
-        // return fractal($task, new TaskTransformer())->respond();
-        return response()->json(Task::find($task), 200);
+        $task = Task::find($task);
+
+        $response = fractal()
+            ->item($task)
+            ->transformWith(new TaskTransformer)
+            ->includeUser()
+            ->toArray();
+
+            return response()->json($response, 200);
     }
 
     /**
@@ -108,7 +115,7 @@ class TaskController extends Controller
      */
     public function update(Request $request, $task)
     {
-        // $this->authorize('update', $task);
+        $this->authorize('update', $task);
 
         $task = Task::find($task);
 
@@ -122,11 +129,11 @@ class TaskController extends Controller
      * @param  \App\Models\Task  $task
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy($task)
     {
-        // $this->authorize('delete', $task);
+        $this->authorize('delete', $task);
 
-        return (Task::destroy($id)== 1) ? 
+        return (Task::destroy($task)== 1) ? 
                 response()->json(['success' => 'success'], 200) : 
                 response()->json(['error' => 'deleting from database was not successful'], 500)  ;
     }
@@ -148,6 +155,7 @@ class TaskController extends Controller
         $response = fractal()
             ->item($task)
             ->transformWith(new TaskTransformer)
+            ->includeUser()
             ->toArray();
      
         return response()->json($response, 201);
@@ -168,5 +176,4 @@ class TaskController extends Controller
         return response()->json($response, 200);
     }
 
-    
 }
