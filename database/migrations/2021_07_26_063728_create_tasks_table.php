@@ -20,6 +20,7 @@ class CreateTasksTable extends Migration
             $table->enum('type', ['basic', 'advanced', 'expert'])->nullable();
             $table->enum('status', ['todo', 'closed', 'hold'])->nullable();
             $table->unsignedBigInteger('user_id')->nullable();
+            $table->unsignedBigInteger('assignee_id')->nullable();
 
             $table->timestamps();
             $table->softDeletes();
@@ -29,6 +30,10 @@ class CreateTasksTable extends Migration
                     ->onDelete('cascade')
                     ->onUpdate('cascade');
 
+            $table->foreign('assignee_id')
+                    ->references('id')->on('users')
+                    ->onDelete('cascade')
+                    ->onUpdate('cascade');
             
         });
     }

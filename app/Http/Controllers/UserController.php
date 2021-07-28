@@ -115,7 +115,8 @@ class UserController extends Controller
     		->toArray();
     }
 
-    public function userOwnTasks(User $user){
+    public function userOwnTasks(User $user)
+    {        
         $user = $user->find(Auth::user()->id);
      
         return fractal()

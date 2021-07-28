@@ -66,9 +66,11 @@ class TaskController extends Controller
             // 'description' => 'required|text|max:4096',
             // 'type' => Rule::in(['basic', 'advanced', 'expert']),
             // 'status' => Rule::in(['todo', 'closed', 'hold']),
+            
 
         ]);
 
+        
         $task = Task::create($request->all());
         
         return $task; //regular

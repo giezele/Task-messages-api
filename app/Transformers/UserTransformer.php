@@ -6,6 +6,8 @@ use League\Fractal\TransformerAbstract;
 use App\Models\User;
 use Illuminate\Support\Facades\App;
 use League\Fractal\ParamBag;
+use League\Fractal\Pagination\IlluminatePaginatorAdapter;
+use App\CustomClasses\CollectionPaginate;
 
 class UserTransformer extends TransformerAbstract
 {
