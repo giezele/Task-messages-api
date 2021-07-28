@@ -57,7 +57,7 @@ class TaskController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(Request $request, Task $task)
     {
         $this->authorize('create', Task::class);
 
@@ -70,10 +70,18 @@ class TaskController extends Controller
 
         ]);
 
+        // $task = Task::create($request->all());
+        $task->create([
+            'user_id' => Auth::user()->id,
+            'name' => $request->content
+        ]);
         
-        $task = Task::create($request->all());
-        
-        return $task; //regular
+        $response = fractal()
+            ->item($task)
+            ->transformWith(new TaskTransformer)
+            ->toArray();
+
+        return response()->json($response, 201);
 
     }
 
@@ -100,7 +108,7 @@ class TaskController extends Controller
      */
     public function update(Request $request, $task)
     {
-        $this->authorize('update', $task);
+        // $this->authorize('update', $task);
 
         $task = Task::find($task);
 
@@ -125,7 +133,7 @@ class TaskController extends Controller
 
     public function addTask(Request $request, Task $task){
         $this->validate($request,[
-            'name' => 'required|min:2'
+            'name' => 'required|string|max:255'
         ]);
      
         $task->create([
@@ -134,6 +142,7 @@ class TaskController extends Controller
             'type'=> $request->type,
             'status'=> $request->status,
             'user_id' => auth()->user()->id,
+            'assignee_id' => $request->assignee_id
         ]);
      
         $response = fractal()

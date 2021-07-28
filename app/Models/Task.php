@@ -22,15 +22,32 @@ class Task extends Model
         'type',
         'status',
         'user_id',
-        // 'owner'
+        'assignee_id'
     ];
 
     /**
-     * The user that belong to the task.
-     * 1 user has many tasks
+     * a task must belong to creator []
+     * @return [type] [description]
      */
     public function user()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'user_id');
+    }
+
+    /**
+     * Get the users that have been assigned to task
+     * @return [type] [description]
+     */
+    public function assignee() {
+    	return $this->belongsTo(User::class);
+    }
+
+    /**
+     * A task has one or many subscriptions
+     * @return [type] [description]
+     */
+    public function subscriptions() {
+        
+        return $this->hasMany(TaskSubscription::class);
     }
 }
