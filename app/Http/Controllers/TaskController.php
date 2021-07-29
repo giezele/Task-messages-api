@@ -11,6 +11,7 @@ use League\Fractal\Pagination\IlluminatePaginatorAdapter;
 use Illuminate\Database\Eloquent\Builder;
 use Spatie\Fractal\Fractal;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Contracts\Validation\Rule;
 
 
 class TaskController extends Controller
@@ -59,26 +60,26 @@ class TaskController extends Controller
      */
     public function store(Request $request, Task $task)
     {
-        // $this->authorize('update', Task::class);
-
         $this->validate($request, [
             'name' => 'required|string|max:255',
-            // 'description' => 'required|text|max:4096',
-            // 'type' => Rule::in(['basic', 'advanced', 'expert']),
-            // 'status' => Rule::in(['todo', 'closed', 'hold']),
-            
-
+            'description' => 'string|max:4096',
+            'type' => 'in:basic,advanced,expert',
+            'status' => 'in:todo,closed,hold',
         ]);
 
-        // $task = Task::create($request->all());
-        $task->create([
-            'user_id' => Auth::user()->id,
-            'name' => $request->content
+        $task = Task::create([
+            'name' => $request->name,
+            'description' => $request->description,
+            'type'=> $request->type,
+            'status'=> $request->status,
+            'user_id' => auth()->user()->id,
+            'assignee_id' => $request->assignee_id
         ]);
         
         $response = fractal()
             ->item($task)
             ->transformWith(new TaskTransformer)
+            ->includeUser()
             ->toArray();
 
         return response()->json($response, 201);
@@ -140,10 +141,13 @@ class TaskController extends Controller
 
     public function addTask(Request $request, Task $task){
         $this->validate($request,[
-            'name' => 'required|string|max:255'
+            'name' => 'required|string|max:255',
+            'description' => 'string|max:4096',
+            'type' => 'in:basic,advanced,expert',
+            'status' => 'in:todo,closed,hold',
         ]);
      
-        $task->create([
+        $task = Task::create([
             'name' => $request->name,
             'description' => $request->description,
             'type'=> $request->type,
@@ -157,7 +161,7 @@ class TaskController extends Controller
             ->transformWith(new TaskTransformer)
             ->includeUser()
             ->toArray();
-     
+
         return response()->json($response, 201);
     }
 

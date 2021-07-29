@@ -39,8 +39,8 @@ class TaskTransformer extends TransformerAbstract
             'description'=> $task->description,
             'type'=> $task->type,
             'status'=> $task->status,
-            'user_id' => $task->user->id,
-            'assignee_id' => $task->assignee->id
+            // 'user_id' => $task->user->id,
+            // 'assignee_id' => $task->assignee->id
         ];
     }
 
