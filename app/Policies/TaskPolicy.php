@@ -30,9 +30,10 @@ class TaskPolicy
      */
     public function view(User $user, Task $task)
     {
-        return $task->user_id == auth()->id() || $task->assignee_id == $user->id;
+        // return $user->id === $task->user_id;
+        return $user->id == $task->user_id || $user->id == $task->assignee_id;
+     
     }
-
     /**
      * Determine whether the user can create models.
      *
@@ -41,7 +42,7 @@ class TaskPolicy
      */
     public function create(User $user)
     {
-        // return $user->is_admin;
+        //
     }
 
     /**
@@ -53,8 +54,7 @@ class TaskPolicy
      */
     public function update(User $user, Task $task)
     {
-        // return $user->is_admin || $task->user_id == auth()->id();
-        return $task->user_id == $user->id;
+        return $task->user_id == $user->id || $task->assignee_id == $user->id;
     }
 
     /**
@@ -66,7 +66,8 @@ class TaskPolicy
      */
     public function delete(User $user, Task $task)
     {
-        return $task->user_id == $user->id;
+        return $user->id === $task->user_id;
+        // return true;
     }
 
     /**

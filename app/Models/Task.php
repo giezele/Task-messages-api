@@ -22,7 +22,7 @@ class Task extends Model
         'type',
         'status',
         'user_id',
-        'assignee_id'
+        // 'assignee_id'
     ];
 
     /**

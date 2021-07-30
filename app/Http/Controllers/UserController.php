@@ -71,9 +71,10 @@ class UserController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show(Request $request, $id)
+    public function show(Request $request, $user)
     {
-        $user = User::find($id);
+        $user = $user->find(Auth::user()->id);
+        // $user = User::find($user);
         $user = new Item($user, $this->userTransformer);
         $this->fractal->parseIncludes($request->get('include', '')); // parse includes
         $user = $this->fractal->createData($user); 
@@ -112,18 +113,24 @@ class UserController extends Controller
     		->collection($users)
     		->transformWith(new UserTransformer)
             ->includeTasks()
-            ->includeAssignedTasks()
+            // ->includeAssignedTasks()
     		->toArray();
     }
 
-    public function userOwnTasks(User $user)
+    public function userOwnTasks(User $user, Request $request)
     {        
         $user = $user->find(Auth::user()->id);
+        $user = new Item($user, $this->userTransformer);
+        $this->fractal->parseIncludes($request->get('include', '')); // parse includes
+        $user = $this->fractal->createData($user); 
+
+        return $user->toArray(); 
      
-        return fractal()
-            ->item($user)
-            ->transformWith(new UserTransformer)
-            ->includeTasks()
-            ->toArray();
+        // return fractal()
+        //     ->item($user)
+        //     ->transformWith(new UserTransformer)
+        //     ->includeTasks()
+        //     // ->includeAssignedTasks()
+        //     ->toArray();
     }
 }

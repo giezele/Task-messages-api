@@ -23,7 +23,8 @@ class TaskTransformer extends TransformerAbstract
      * @var array
      */
     protected $availableIncludes = [
-        'user'
+        'user',
+        'assignee'
     ];
     
     /**
@@ -50,5 +51,11 @@ class TaskTransformer extends TransformerAbstract
             return null;
         }
         return $this->item($task->user, App::make(UserTransformer::class));
+    }
+
+    public function includeAssignee(Task $task)
+    {
+        return $this->item($task->assignee, App::make(UserTransformer::class));
+        // return new Primitive($task->assignee_id);
     }
 }
