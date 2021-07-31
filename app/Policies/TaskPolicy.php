@@ -5,6 +5,8 @@ namespace App\Policies;
 use App\Models\Task;
 use App\Models\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
+use App\Http\Controllers\TaskController;
+use JWTAuth;
 
 class TaskPolicy
 {
@@ -30,9 +32,12 @@ class TaskPolicy
      */
     public function view(User $user, Task $task)
     {
-        // return $user->id === $task->user_id;
+        $user = JWTAuth::parseToken()->authenticate();
+
+        if (!$user){
+            return response()->json(['msg' => 'forbidden'], 403);
+        }
         return $user->id == $task->user_id || $user->id == $task->assignee_id;
-     
     }
     /**
      * Determine whether the user can create models.
@@ -54,7 +59,13 @@ class TaskPolicy
      */
     public function update(User $user, Task $task)
     {
-        return $task->user_id == $user->id || $task->assignee_id == $user->id;
+        $user = JWTAuth::parseToken()->authenticate();
+
+        if (!$user){
+            return response()->json(['msg' => 'forbidden'], 403);
+        }
+        return $user->id == $task->user_id;
+
     }
 
     /**
@@ -66,8 +77,12 @@ class TaskPolicy
      */
     public function delete(User $user, Task $task)
     {
-        return $user->id === $task->user_id;
-        // return true;
+        $user = JWTAuth::parseToken()->authenticate();
+
+        if (!$user){
+            return response()->json(['msg' => 'forbidden'], 403);
+        }
+        return $user->id == $task->user_id;
     }
 
     /**

@@ -31,7 +31,7 @@ Route::group([
     Route::get('/user-profile', [AuthController::class, 'userProfile']);    
 });
 
-Route::group(['middleware' => 'auth:api'], function() {
+Route::group(['middleware' => ['jwt.auth']], function() {
     Route::apiResource('tasks', TaskController::class);
     Route::apiResource('users', UserController::class);
 

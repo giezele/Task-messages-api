@@ -13,6 +13,7 @@ use Spatie\Fractal\Fractal;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Contracts\Validation\Rule;
 use App\Models\User;
+use JWTAuth;
 
 
 class TaskController extends Controller
@@ -31,7 +32,9 @@ class TaskController extends Controller
     {
         $this->fractal = $fractal;
         $this->taskTransformer = $taskTransformer;
+        $this->middleware('jwt.auth' , ['only' => ['store', 'index', 'show', 'update', 'destroy']]); 
         // $this->authorizeResource(Task::class, 'task');
+        
     }
 
     /**
@@ -42,6 +45,12 @@ class TaskController extends Controller
     public function index(Request $request, Task $task)
     {
         // $this->authorize('view', $task);
+        $user = JWTAuth::parseToken()->authenticate();
+
+        if (! $user){
+            return response()->json(['msg' => 'user not found']);
+        }
+
 
         $paginator = Task::paginate(10);
         // $tasks = Task::all();
@@ -67,8 +76,6 @@ class TaskController extends Controller
      */
     public function store(Request $request, Task $task)
     {
-        $user = auth()->user();
-
         $this->validate($request, [
             'name' => 'required|string|max:255',
             'description' => 'string|max:4096',
@@ -81,11 +88,11 @@ class TaskController extends Controller
             'description' => $request->description,
             'type'=> $request->type,
             'status'=> $request->status,
-            'user_id' => auth()->user()->id,
+            // 'user_id' => auth()->user()->id,
             // 'assignee_id' => $request->except('assignee_id'),
         ];
         $task = Task::create($data);
-        
+        $task->user()->associate(User::find(auth()->user()->id));
         $task->assignee()->associate(User::find($request->input('assignee_id')));
         $task->save();
         
@@ -108,8 +115,9 @@ class TaskController extends Controller
      */
     public function show($task)
     {
-        // $this->authorize('view', $task);
         $task = Task::find($task);
+        $this->authorize('view', $task);
+
         
         $response = fractal()
             ->item($task)
@@ -130,7 +138,9 @@ class TaskController extends Controller
      */
     public function update(Request $request, $task)
     {
-        // $this->authorize('update', $task);
+        $task = Task::find($task);
+
+        $this->authorize('update', $task);
 
         $this->validate($request, [
             'name' => 'required|string|max:255',
@@ -139,7 +149,6 @@ class TaskController extends Controller
             'status' => 'in:todo,closed,hold',
         ]);
 
-        $task = Task::find($task);
         $task->assignee()->associate(User::find($request->input('assignee_id')));
         $task->save();
 
@@ -152,6 +161,7 @@ class TaskController extends Controller
             ->toArray();
     
         return response()->json($response, 200); 
+    // }
     }
 
     /**
@@ -160,13 +170,24 @@ class TaskController extends Controller
      * @param  \App\Models\Task  $task
      * @return \Illuminate\Http\Response
      */
-    public function destroy($task)
+    public function destroy(Task $task)
     {
-        // $this->authorize('delete', $task);
+        $this->authorize('delete', $task);
+        $task->delete();
         
-        return (Task::destroy($task)== 1) ? 
-                response()->json(['success' => 'deleted successfully'], 200) : 
-                response()->json(['error' => 'deleting from database was not successful'], 500)  ;
+        return response()->json([
+            'success' => true,
+            'message' => 'Task deleted successfully'
+        ], 200);
+
+        // $user = JWTAuth::parseToken()->authenticate();
+        // if($user->can('delete', $task)){
+        //     return ['success' => 'bus successfully'];
+        // }
+        
+        // return (Task::destroy($task)== 1) ? 
+        //         response()->json(['success' => 'deleted successfully'], 200) : 
+        //         response()->json(['error' => 'deleting from database was not successful'], 500)  ;
     }
 
     public function addTask(Request $request, Task $task){

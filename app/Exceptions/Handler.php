@@ -27,15 +27,22 @@ class Handler extends ExceptionHandler
         'password_confirmation',
     ];
 
-    /**
-     * Register the exception handling callbacks for the application.
-     *
+     /**
+     * @param Throwable $exception
      * @return void
+     * @throws Throwable
      */
     public function register()
     {
-        $this->reportable(function (Throwable $e) {
-            //
-        });
+         $this->renderable(function(Throwable $e, $request) {
+             return $this->handleException($request, $e);
+         });
+    }
+
+     public function handleException($request, Throwable $exception)
+    {
+     if($exception instanceof RouteNotFoundException) {
+        return response('The specified URL cannot be  found.', 404);
+     }
     }
 }
