@@ -40,7 +40,7 @@ Route::group(['middleware' => ['jwt.auth']], function() {
     Route::get('/user-tasks',[UserController::class, 'userOwnTasks']);
     Route::post('/add-task',[TaskController::class, 'addTask']);
     Route::put('/task-status/{task}', [TaskController::class, 'changeTaskStatus']);
-    Route::get('/users/me/tasks', [TaskController::class, 'authUserTasks']);
+    Route::get('/users/me/tasks', [TaskController::class, 'includingTasks']);
 
 });
 

@@ -12,8 +12,10 @@ use Illuminate\Database\Eloquent\Builder;
 use Spatie\Fractal\Fractal;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Contracts\Validation\Rule;
+use Illuminate\Support\Facades\Validator;
 use App\Models\User;
 use JWTAuth;
+use DB;
 
 
 class TaskController extends Controller
@@ -46,23 +48,15 @@ class TaskController extends Controller
     {
         // $this->authorize('view', $task);
         $user = JWTAuth::parseToken()->authenticate();
-
-        if (! $user){
-            return response()->json(['msg' => 'user not found']);
-        }
-
-
-        $paginator = Task::paginate(10);
-        // $tasks = Task::all();
-        $tasks = Task::with('user')->orderBy('id')->get();
-        $tasks = $paginator->getCollection();
-
+       
+        $tasks = Task::where('user_id', $user->id)->orWhere('assignee_id', $user->id)->paginate(5);
+       
         $response = fractal()
             ->collection($tasks)
             ->transformWith(new TaskTransformer)
             ->includeUser()
             ->includeAssignee()
-            ->paginateWith(new IlluminatePaginatorAdapter($paginator))
+            ->paginateWith(new IlluminatePaginatorAdapter($tasks))
             ->toArray();
 
     return response()->json($response, 200);
@@ -126,7 +120,7 @@ class TaskController extends Controller
             ->includeAssignee()
             ->toArray();
         
-        return response()->json($response, 200);          
+        return response()->json($response, 200);
     }
 
     /**
@@ -221,7 +215,7 @@ class TaskController extends Controller
 
     public function changeTaskStatus(Request $request, Task $task)
     {
-        $this->authorize('update', $task);
+        $this->authorize('view', $task);
 
         $validator = Validator::make(Input::only(['status']), [
             'type' => 'in:todo,closed,hold' 
@@ -243,7 +237,7 @@ class TaskController extends Controller
         return response()->json($response, 200);
     }
 
-    public function authUserTasks(Task $task)
+    public function authUserTasks(Task $task) //nope
     {
         $tasks = Task::where('user_id', auth()->user()->id);
             // ->orWhere('assignee_id', auth()->user()->id);
