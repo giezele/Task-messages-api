@@ -34,7 +34,7 @@ class TaskController extends Controller
     {
         $this->fractal = $fractal;
         $this->taskTransformer = $taskTransformer;
-        $this->middleware('jwt.auth' , ['only' => ['store', 'index', 'show', 'update', 'destroy']]); 
+        $this->middleware('jwt.auth' , ['only' => ['store', 'index', 'show', 'update', 'destroy', 'changeTaskStatus']]); 
         // $this->authorizeResource(Task::class, 'task');
         
     }
@@ -56,6 +56,7 @@ class TaskController extends Controller
             ->transformWith(new TaskTransformer)
             ->includeUser()
             ->includeAssignee()
+            ->includeMessages()
             ->paginateWith(new IlluminatePaginatorAdapter($tasks))
             ->toArray();
 
@@ -217,7 +218,7 @@ class TaskController extends Controller
     {
         $this->authorize('view', $task);
 
-        $validator = Validator::make(Input::only(['status']), [
+        $validator = Validator::make($request->only(['status']), [
             'type' => 'in:todo,closed,hold' 
         ]);
 
@@ -232,6 +233,7 @@ class TaskController extends Controller
             ->item($task)
             ->transformWith(new TaskTransformer)
             ->includeUser()
+            ->includeAssignee()
             ->toArray();
      
         return response()->json($response, 200);

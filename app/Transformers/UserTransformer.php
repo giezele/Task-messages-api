@@ -27,7 +27,8 @@ class UserTransformer extends TransformerAbstract
      */
     protected $availableIncludes = [
         'tasks',
-        'assigned_tasks'
+        'assignedTasks',
+        'messages'
     ];
     
     /**
@@ -54,8 +55,14 @@ class UserTransformer extends TransformerAbstract
 
     public function includeAssignedTasks(User $user, ParamBag $paramBag)
     {
-        $assignedTasks = $user->assigned_tasks()->get();
+        $assignedTasks = $user->assignedTasks()->get();//get grazina collection
 
         return $this->collection($assignedTasks, App::make(TaskTransformer::class));
+    }
+
+    public function includeTaskMessages(User $user){
+        $messages = $user->messages();
+ 
+        return $this->collection($messages, new MessageTransformer);
     }
 }

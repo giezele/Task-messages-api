@@ -24,7 +24,8 @@ class TaskTransformer extends TransformerAbstract
      */
     protected $availableIncludes = [
         'user',
-        'assignee'
+        'assignee',
+        'messages'
     ];
     
     /**
@@ -56,6 +57,15 @@ class TaskTransformer extends TransformerAbstract
     public function includeAssignee(Task $task)
     {
         return $this->item($task->assignee, App::make(UserTransformer::class));
-        // return new Primitive($task->assignee_id);
     }
+
+    public function includeMessages(Task $task)
+    {
+        if (!$task->messages) {
+            return null;
+        }
+        return $this->collection($task->messages, App::make(MessageTransformer::class));
+    }
+
+
 }

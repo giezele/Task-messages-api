@@ -29,8 +29,7 @@ class Task extends Model
      * a task must belong to creator []
      * @return [type] [description]
      */
-    public function user()
-    {
+    public function user() {
         return $this->belongsTo(User::class, 'user_id');
     }
 
@@ -49,5 +48,14 @@ class Task extends Model
     public function subscriptions() {
         
         return $this->hasMany(TaskSubscription::class);
+    }
+
+    /**
+     * A task has one or many messages
+     * @return [type] [description]
+     */
+    public function messages() {
+        
+        return $this->hasMany(Message::class);
     }
 }
