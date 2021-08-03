@@ -67,34 +67,7 @@ class MessageController extends Controller
      */
     public function store(Request $request, Task $task)
     {
-        $user = JWTAuth::parseToken()->authenticate();
-
-        // $this->authorize('create', Task::class);
-
-        $this->validate($request, [
-            'subject' => 'required|string|max:255',
-            'message' => 'string|max:4096',
-        ]);
-
-        $data = [
-            'subject' => $request->subject,
-            'message'=> $request->message,
-            
-        ];
-
-        $message = Message::create($data);
-        $message->user()->associate(Auth::id());
-        $message->task()->associate(Task::find($request->input('task_id')));
-        $message->save();
-        
-        $response = fractal()
-            ->item($message)
-            ->transformWith(new MessageTransformer)
-            // ->includeUser()
-            // ->includeAssignee()
-            ->toArray();
-
-        return response()->json($response, 201);
+        //
 
     }
 
@@ -154,60 +127,4 @@ class MessageController extends Controller
         ], 200);
     }
 
-    public function addMessage(Request $request, Message $message){
-        $user = JWTAuth::parseToken()->authenticate();
-
-        $this->validate($request, [
-            'subject' => 'required|string|max:255',
-            'message' => 'string|max:4096',
-        ]);
-
-        $data = [
-            'subject' => $request->subject,
-            'message'=> $request->message,
-            
-        ];
-
-        $message = new Message;
-        $message->subject = $request->get('subject');
-        $message->message = $request->get('message');
-        $message->user()->associate($request->user());
-        $task = Task::find($request->get('task_id'));
-        $task->messages()->save($message);
-        
-        $response = fractal()
-            ->item($message)
-            ->transformWith(new MessageTransformer)
-            // ->includeUser()
-            // ->includeAssignee()
-            ->toArray();
-
-        return response()->json($response, 201);
-
-    }
-
-    public function getMessages($task){
-
-        // dd($task->user->id);
-
-        // $user = JWTAuth::parseToken()->authenticate();
-        // if (!$user){
-        //     return response()->json(['msg' => 'forbidden'], 403);
-        // } else if ($user !== $task->user->id){
-
-        //     return response()->json(['msg' => 'you do not own it'], 403);
-        // }
-
-        $messages = Message::where('task_id', $task)->get();
-        // $messages = Task::with('messages')->find($task);
-        // $messages = Task::with('messages')->find($task);
-       
-        $response = fractal()
-            ->collection($messages)
-            ->transformWith(new MessageTransformer)
-            // ->paginateWith(new IlluminatePaginatorAdapter($messages))
-            ->toArray();
-
-        return response()->json($response, 200);
-    }
 }

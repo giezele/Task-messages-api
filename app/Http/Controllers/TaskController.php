@@ -179,40 +179,12 @@ class TaskController extends Controller
 
     }
 
-    public function addTask(Request $request, Task $task){
-        $this->validate($request,[
-            'name' => 'required|string|max:255',
-            'description' => 'string|max:4096',
-            'type' => 'in:basic,advanced,expert',
-            'status' => 'in:todo,closed,hold',
-        ]);
-     
-        $task = Task::create([
-            'name' => $request->name,
-            'description' => $request->description,
-            'type'=> $request->type,
-            'status'=> $request->status,
-            'user_id' => auth()->user()->id,
-        ]);
-        $task->assignee()->associate(User::find($request->input('assignee_id')));
-        $task->save();
-     
-        $response = fractal()
-            ->item($task)
-            ->transformWith(new TaskTransformer)
-            ->includeUser()
-            ->includeAssignee()
-            ->toArray();
-
-        return response()->json($response, 201);
-    }
-
     public function changeTaskStatus(Request $request, Task $task)
     {
         $this->authorize('view', $task);
 
         $validator = Validator::make($request->only(['status']), [
-            'type' => 'in:todo,closed,hold' 
+            'type' => 'closed' 
         ]);
 
         if($validator->fails()){
@@ -278,7 +250,7 @@ class TaskController extends Controller
         
     }
 
-    public function getMessage(Task $task, $message){
+    public function getMessage(Task $task, $message){//reikia
 
         $this->authorize('view', $task);
 

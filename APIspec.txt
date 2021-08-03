@@ -2,10 +2,10 @@ Register
 POST api/auth/register
 {
     "user": {
-        "name"
-        "email"
-        "password"
-        "password_confirmation"
+        "name":
+        "email":
+        "password":
+        "password_confirmation":
     }
     
 }
@@ -20,16 +20,15 @@ POST  api/auth/login
 }
 
 Create a task
-POST /api/add-task
+POST /api/tasks
 Constraints: Authenticated users
 {
   "tasks": {
-    "id": 
     "name": "title of task",
     "description": "description of task",
     "type": "basic",
     "status" "todo",
-    "assignee_id": , 
+    "assignee_id": 
   }
 }
 
@@ -37,6 +36,82 @@ View a task
 GET /api/tasks/{task}
 Constraints: Authenticated and Authorized[Policy]
 Authorized means you are either the owner (user that created the task), or task is assigned to you
-{
 
+
+Update a task
+PUT /api/tasks/{task}
+Constraints: Authenticated and Authorized[Policy]
+Only owner can update the task
+{
+  "tasks": {
+    "name": "title of task",
+    "description": "description of task",
+    "type": "basic",
+    "status": "todo",
+    "assignee_id": 
+  }
 }
+
+Delete a task
+DELETE /api/tasks/{task}
+Constraints: Authenticated and Authorized[Policy]
+Only owner can delete the task
+
+
+Change task status
+PUT /api/tasks/{task}/status
+Constraints: Authenticated and Authorized[Policy]
+Owner and assiged user can update the task status
+{
+  "status": "closed"
+}
+
+
+View paginated list of tasks 
+GET /api/tasks
+Constraints: Authenticated and Authorized[Policy]
+User can see list of tasks that are assigned to or created by this user
+
+
+Create a message
+POST /api/tasks/messages/add
+Constraints: Authenticated and Authorized[Policy]
+User can create a message only on tasks that are assigned to or created by user
+{
+  "message": {
+    "subject": "subject of message",
+    "message": "content of message",
+    "task_id": 
+  }
+}
+
+Update a message
+PUT /api/tasks/messages/{message}
+Constraints: Authenticated and Authorized[Policy]
+Only owner (user that created the message) can update a message
+{
+  "message": {
+    "subject": "subject of message",
+    "message": "content of message",
+  
+  }
+}
+
+Delete a message
+DELETE /api/tasks/messages/{message}
+Constraints: Authenticated and Authorized[Policy]
+User can only delete their own messages
+
+
+View a paginated list of massages of task
+GET /api/tasks/{task}/messages
+Constraints: Authenticated and Authorized[Policy]
+User can see list of messages of task that is assigned to or created by this user
+
+
+View message
+GET /api/tasks/{task}/messages/{message}
+Constraints: Authenticated and Authorized[Policy]
+User can view a message only of tasks that are assigned to or created by user
+
+

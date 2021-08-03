@@ -32,29 +32,22 @@ Route::group([
     Route::get('/user-profile', [AuthController::class, 'userProfile']);    
 });
 
-Route::group(['middleware' => ['jwt.auth']], function() {
+Route::group(['middleware' => ['jwt.auth']
+
+], function() {
     Route::apiResource('tasks', TaskController::class);
-    Route::apiResource('users', UserController::class);//nereikalingas?
-    Route::apiResource('messages', MessageController::class);
 
     Route::put('/tasks/{task}/status', [TaskController::class, 'changeTaskStatus']);
 
-
-    Route::get('/user-all',[UserController::class, 'usersAll']);
-    Route::get('/user-tasks',[UserController::class, 'userOwnTasks']);
-    Route::post('/add-task',[TaskController::class, 'addTask']);
-
-    Route::post('/messages/add', [TaskController::class, 'addMessage']);
-    Route::post('/add-message', [MessageController::class, 'addMessage']);
-    Route::get('/tasks/{task}/messages', [MessageController::class, 'getMessages']);//blogai
+    Route::post('/tasks/messages/add', [TaskController::class, 'addMessage']);
+    Route::put('/tasks/messages/{message}', [MessageController::class, 'update']);
+    Route::delete('/tasks/messages/{message}', [MessageController::class, 'destroy']);
+    Route::get('/tasks/{task}/messages', [TaskController::class, 'getMessagesOfTask']);
     Route::get('/tasks/{task}/messages/{message}', [TaskController::class, 'getMessage']);
-    Route::get('/tasks/{task}/get-messages', [TaskController::class, 'getMessagesOfTask']);//gerai
 
 });
 
 
-//no-auth
-// Route::apiResource('tasks', TaskController::class);
 
 //sanity check
 Route::get('/hello', function(){
