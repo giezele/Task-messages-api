@@ -4,7 +4,9 @@ namespace App\Policies;
 
 use App\Models\Message;
 use App\Models\User;
+use App\Models\Task;
 use Illuminate\Auth\Access\HandlesAuthorization;
+use JWTAuth;
 
 class MessagePolicy
 {
@@ -28,9 +30,9 @@ class MessagePolicy
      * @param  \App\Models\Message  $message
      * @return \Illuminate\Auth\Access\Response|bool
      */
-    public function view(User $user, Message $message, Task $task)
+    public function view(User $user, Message $message)
     {
-        
+       //
     }
 
     /**
@@ -39,7 +41,7 @@ class MessagePolicy
      * @param  \App\Models\User  $user
      * @return \Illuminate\Auth\Access\Response|bool
      */
-    public function create(User $user)
+    public function create(User $user, Message $message)
     {
         //
     }
@@ -53,7 +55,13 @@ class MessagePolicy
      */
     public function update(User $user, Message $message)
     {
-        //
+        $user = JWTAuth::parseToken()->authenticate();
+
+        if (!$user){
+            return response()->json(['msg' => 'forbidden'], 403);
+        }
+        return $user->id == $message->user_id;
+
     }
 
     /**
@@ -65,7 +73,12 @@ class MessagePolicy
      */
     public function delete(User $user, Message $message)
     {
-        //
+        $user = JWTAuth::parseToken()->authenticate();
+
+        if (!$user){
+            return response()->json(['msg' => 'forbidden'], 403);
+        }
+        return $user->id == $message->user_id;
     }
 
     /**

@@ -22,7 +22,7 @@ class MessageTransformer extends TransformerAbstract
      * @var array
      */
     protected $availableIncludes = [
-        //
+        'user',
     ];
     
     /**
@@ -40,5 +40,10 @@ class MessageTransformer extends TransformerAbstract
             'task_id' => $message->task_id,
             'created_at' => $message->created_at->diffForHumans()
         ];
+    }
+
+    public function includeMsgUser(Message $message)
+    {
+        return $this->item($message->user, new MessageTransformer);
     }
 }

@@ -55,7 +55,7 @@ class UserTransformer extends TransformerAbstract
 
     public function includeAssignedTasks(User $user, ParamBag $paramBag)
     {
-        $assignedTasks = $user->assignedTasks()->get();//get grazina collection
+        $assignedTasks = $user->assigned_tasks()->get();//get grazina collection
 
         return $this->collection($assignedTasks, App::make(TaskTransformer::class));
     }

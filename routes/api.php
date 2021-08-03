@@ -35,14 +35,20 @@ Route::group([
 Route::group(['middleware' => ['jwt.auth']], function() {
     Route::apiResource('tasks', TaskController::class);
     Route::apiResource('users', UserController::class);//nereikalingas?
+    Route::apiResource('messages', MessageController::class);
+
+    Route::put('/tasks/{task}/status', [TaskController::class, 'changeTaskStatus']);
 
 
     Route::get('/user-all',[UserController::class, 'usersAll']);
     Route::get('/user-tasks',[UserController::class, 'userOwnTasks']);
     Route::post('/add-task',[TaskController::class, 'addTask']);
-    Route::put('/tasks/{task}/status', [TaskController::class, 'changeTaskStatus']);
 
+    Route::post('/messages/add', [TaskController::class, 'addMessage']);
     Route::post('/add-message', [MessageController::class, 'addMessage']);
+    Route::get('/tasks/{task}/messages', [MessageController::class, 'getMessages']);//blogai
+    Route::get('/tasks/{task}/messages/{message}', [TaskController::class, 'getMessage']);
+    Route::get('/tasks/{task}/get-messages', [TaskController::class, 'getMessagesOfTask']);//gerai
 
 });
 

@@ -19,12 +19,12 @@ class Message extends Model
     protected $fillable = [
         'subject',
         'message',
-        'user_id',
+        // 'user_id',
         // 'task_id'
     ];
 
     public function task() {
-        return $this->belongsTo(Task::class, 'task_id');
+        return $this->belongsTo(Task::class);
     }
 
     public function user() {

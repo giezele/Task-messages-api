@@ -14,6 +14,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Contracts\Validation\Rule;
 use Illuminate\Support\Facades\Validator;
 use App\Models\User;
+use App\Models\Message;
+use App\Transformers\MessageTransformer;
 use JWTAuth;
 use DB;
 
@@ -35,7 +37,6 @@ class TaskController extends Controller
         $this->fractal = $fractal;
         $this->taskTransformer = $taskTransformer;
         $this->middleware('jwt.auth' , ['only' => ['store', 'index', 'show', 'update', 'destroy', 'changeTaskStatus']]); 
-        // $this->authorizeResource(Task::class, 'task');
         
     }
 
@@ -110,7 +111,7 @@ class TaskController extends Controller
      */
     public function show($task)
     {
-        $task = Task::find($task);
+        $task = Task::findOrFail($task);
         $this->authorize('view', $task);
 
         
@@ -119,6 +120,7 @@ class TaskController extends Controller
             ->transformWith(new TaskTransformer)
             ->includeUser()
             ->includeAssignee()
+            ->includeMessages()
             ->toArray();
         
         return response()->json($response, 200);
@@ -156,7 +158,7 @@ class TaskController extends Controller
             ->toArray();
     
         return response()->json($response, 200); 
-    // }
+
     }
 
     /**
@@ -175,14 +177,6 @@ class TaskController extends Controller
             'message' => 'Task deleted successfully'
         ], 200);
 
-        // $user = JWTAuth::parseToken()->authenticate();
-        // if($user->can('delete', $task)){
-        //     return ['success' => 'bus successfully'];
-        // }
-        
-        // return (Task::destroy($task)== 1) ? 
-        //         response()->json(['success' => 'deleted successfully'], 200) : 
-        //         response()->json(['error' => 'deleting from database was not successful'], 500)  ;
     }
 
     public function addTask(Request $request, Task $task){
@@ -199,7 +193,6 @@ class TaskController extends Controller
             'type'=> $request->type,
             'status'=> $request->status,
             'user_id' => auth()->user()->id,
-            // 'assignee_id' => $request->assignee_id
         ]);
         $task->assignee()->associate(User::find($request->input('assignee_id')));
         $task->save();
@@ -239,18 +232,63 @@ class TaskController extends Controller
         return response()->json($response, 200);
     }
 
-    public function authUserTasks(Task $task) //nope
-    {
-        $tasks = Task::where('user_id', auth()->user()->id);
-            // ->orWhere('assignee_id', auth()->user()->id);
-            // ->filter($filter);
+    public function addMessage(Request $request, Task $task){
+       
+        $task = Task::findOrFail($request->get('task_id'));
+        $this->authorize('view', $task);
 
-        $response = fractal()	
-            ->collection($tasks)
-            ->transformWith(new TaskTransformer)
-            ->includeUser()
+        $this->validate($request, [
+            'subject' => 'required|string|max:255',
+            'message' => 'string|max:4096',
+        ]);
+
+        $message = new Message([
+            'subject' => $request->get('subject'),
+            'message' => $request->get('message')
+        ]);
+
+        $message->user()->associate($request->user());
+        $task->messages()->save($message);
+        
+        $response = fractal()
+            ->item($message)
+            ->transformWith(new MessageTransformer)
+            ->includeMsgUser()
+            // ->includeAssignee()
             ->toArray();
-             
+
+        return response()->json($response, 201);
+    }
+
+
+    public function getMessagesOfTask(Task $task){
+
+        // dd($task->user->id);
+        $this->authorize('view', $task);
+
+        $messages = Message::where('task_id', $task->id)->paginate(3);
+       
+        $response = fractal()
+            ->collection($messages)
+            ->transformWith(new MessageTransformer)
+            ->paginateWith(new IlluminatePaginatorAdapter($messages))
+            ->toArray();
+
+        return response()->json($response, 200);
+        
+    }
+
+    public function getMessage(Task $task, $message){
+
+        $this->authorize('view', $task);
+
+        $message = Message::findOrFail($message);
+       
+        $response = fractal()
+            ->item($message)
+            ->transformWith(new MessageTransformer)
+             ->toArray();
+
         return response()->json($response, 200);
     }
 

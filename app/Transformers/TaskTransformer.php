@@ -48,9 +48,6 @@ class TaskTransformer extends TransformerAbstract
 
     public function includeUser(Task $task)
     {
-        if (!$task->user) {
-            return null;
-        }
         return $this->item($task->user, App::make(UserTransformer::class));
     }
 
@@ -61,10 +58,9 @@ class TaskTransformer extends TransformerAbstract
 
     public function includeMessages(Task $task)
     {
-        if (!$task->messages) {
-            return null;
-        }
-        return $this->collection($task->messages, App::make(MessageTransformer::class));
+        $messages = $task->messages()->get();
+
+        return $this->collection($messages, new MessageTransformer);
     }
 
 
