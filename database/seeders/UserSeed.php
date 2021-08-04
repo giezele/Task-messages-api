@@ -23,7 +23,6 @@ class UserSeed extends Seeder
             'name' => 'admin',
            'email' => 'admin@admin.com',
            'password' => 'admin123',
-           'is_admin' => true,
         ]);
 
         // generate a few more users 

@@ -6,6 +6,7 @@ A simple Laravel application to allow users manage their tasks. Tasks can have m
 ## Usage
 
 - Clone the project with ``` git clone ```
+- Create "new Schema" in your database
 - Copy ```.env.example``` file to ```.env``` and edit database credentials there
 ```
 DB_DATABASE={your db name}
