@@ -8,9 +8,6 @@ A simple Laravel application to allow users manage their tasks. Tasks can have m
 - Clone the project with ``` git clone ```
 - Copy ```.env.example``` file to ```.env``` and edit database credentials there
 ```
-DB_CONNECTION=mysql
-DB_HOST=127.0.0.1
-DB_PORT=3306
 DB_DATABASE={your db name}
 DB_USERNAME={your username}
 DB_PASSWORD={your password}
@@ -19,5 +16,6 @@ DB_PASSWORD={your password}
 - Run ```php artisan migrate --seed```
 - Run ```php artisan serve```
 
-The API will be running on localhost:8000.
+
+Check APIspec for API endpoints
 

@@ -27,7 +27,7 @@ Constraints: Authenticated users
     "name": "title of task",
     "description": "description of task",
     "type": "basic",
-    "status" "todo",
+    "status": "todo",
     "assignee_id": 
   }
 }
