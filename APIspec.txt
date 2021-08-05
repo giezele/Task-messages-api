@@ -11,6 +11,9 @@ POST api/auth/register
 }
 
 Login
+For handling the token encryption, generate a secret key by executing the following command.
+php artisan jwt:secret
+
 POST  api/auth/login
 {
     "user": {
@@ -114,4 +117,8 @@ GET /api/tasks/{task}/messages/{message}
 Constraints: Authenticated and Authorized[Policy]
 User can view a message only of tasks that are assigned to or created by user
 
+View a tasks message log
+GET //api/tasks/{task}/log
+Constraints: Authenticated and Authorized[Policy]
+User can view a message log only of tasks that are assigned to or created by user
 

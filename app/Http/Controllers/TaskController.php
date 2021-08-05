@@ -2,22 +2,19 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Task;
-use Illuminate\Http\Request;
-use League\Fractal\Manager;
-use League\Fractal\Resource\Collection;
-use App\Transformers\TaskTransformer;
-use League\Fractal\Pagination\IlluminatePaginatorAdapter;
-use Illuminate\Database\Eloquent\Builder;
-use Spatie\Fractal\Fractal;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Contracts\Validation\Rule;
-use Illuminate\Support\Facades\Validator;
-use App\Models\User;
+use App\Events\MessageCreated;
+use App\Events\MessageWasViewed;
 use App\Models\Message;
+use App\Models\Task;
+use App\Models\User;
 use App\Transformers\MessageTransformer;
+use App\Transformers\TaskTransformer;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
+use League\Fractal\Manager;
+use League\Fractal\Pagination\IlluminatePaginatorAdapter;
 use JWTAuth;
-use DB;
 
 
 class TaskController extends Controller
@@ -84,8 +81,7 @@ class TaskController extends Controller
             'description' => $request->description,
             'type'=> $request->type,
             'status'=> $request->status,
-            // 'user_id' => auth()->user()->id,
-            // 'assignee_id' => $request->except('assignee_id'),
+
         ];
         $task = Task::create($data);
         $task->user()->associate(User::find(auth()->user()->id));
@@ -229,6 +225,8 @@ class TaskController extends Controller
             // ->includeAssignee()
             ->toArray();
 
+        event(new MessageCreated($message));
+
         return response()->json($response, 201);
     }
 
@@ -255,6 +253,8 @@ class TaskController extends Controller
         $this->authorize('view', $task);
 
         $message = Message::findOrFail($message);
+
+        event(new MessageWasViewed($message));
        
         $response = fractal()
             ->item($message)
@@ -262,6 +262,17 @@ class TaskController extends Controller
              ->toArray();
 
         return response()->json($response, 200);
+    }
+
+    public function getMessageLogOfTask(Task $task){
+
+        $this->authorize('view', $task);
+        
+        $log = DB::select( DB::raw("SELECT * FROM message_log WHERE task_id = :taskId"), 
+            array('taskId' => $task->id)
+        );
+        
+        return response()->json($log, 200);
     }
 
 }

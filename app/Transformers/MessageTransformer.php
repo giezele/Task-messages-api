@@ -38,7 +38,8 @@ class MessageTransformer extends TransformerAbstract
             'message'=> $message->message,
             'user_id' => $message->user_id,
             'task_id' => $message->task_id,
-            'created_at' => $message->created_at->diffForHumans()
+            'created_at' => $message->created_at->diffForHumans(),
+            'updated_at' => $message->updated_at->diffForHumans()
         ];
     }
 

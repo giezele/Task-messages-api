@@ -63,7 +63,7 @@ class TaskPolicy
 
         if (!$user){
             return response()->json(['msg' => 'forbidden'], 403);
-        }
+        } 
         return $user->id == $task->user_id;
 
     }

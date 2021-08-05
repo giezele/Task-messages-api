@@ -3,20 +3,16 @@
 namespace App\Http\Controllers;
 
 use App\Models\Message;
+use App\Events\MessageUpdated;
+use App\Events\MessageDeleted;
 use Illuminate\Http\Request;
 use League\Fractal\Manager;
-use League\Fractal\Resource\Collection;
 use App\Transformers\MessageTransformer;
 use League\Fractal\Pagination\IlluminatePaginatorAdapter;
-use Illuminate\Database\Eloquent\Builder;
-use Spatie\Fractal\Fractal;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Contracts\Validation\Rule;
-use Illuminate\Support\Facades\Validator;
 use App\Models\User;
 use App\Models\Task;
 use JWTAuth;
-use DB;
+use Illuminate\Support\Facades\DB;
 
 class MessageController extends Controller
 {
@@ -101,6 +97,9 @@ class MessageController extends Controller
         ]);
 
         $message->update($request->all());
+
+        event(new MessageUpdated($message));
+
         $response = fractal()
             ->item($message)
             ->transformWith(new MessageTransformer)
@@ -121,6 +120,8 @@ class MessageController extends Controller
         $this->authorize('delete', $message);
         $message->delete();
         
+        event(new MessageDeleted($message));
+
         return response()->json([
             'success' => true,
             'message' => 'message deleted successfully'
