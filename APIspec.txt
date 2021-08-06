@@ -11,9 +11,6 @@ POST api/auth/register
 }
 
 Login
-For handling the token encryption, generate a secret key by executing the following command.
-php artisan jwt:secret
-
 POST  api/auth/login
 {
     "user": {

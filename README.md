@@ -17,6 +17,11 @@ DB_PASSWORD={your password}
 - Run ```php artisan migrate --seed```
 - Run ```php artisan serve```
 
+For handling the JWT token encryption, generate a secret key by executing the following command
 
-Check APIspec for API endpoints
+```php artisan jwt:secret```
+
+
+
+**Check APIspec for API endpoints**
 
