@@ -180,7 +180,7 @@ class TaskController extends Controller
         $this->authorize('view', $task);
 
         $validator = Validator::make($request->only(['status']), [
-            'type' => 'closed' 
+            'status' => 'in:closed' 
         ]);
 
         if($validator->fails()){
@@ -232,7 +232,6 @@ class TaskController extends Controller
 
 
     public function getMessagesOfTask(Task $task){
-
         // dd($task->user->id);
         $this->authorize('view', $task);
 
@@ -248,11 +247,14 @@ class TaskController extends Controller
         
     }
 
-    public function getMessage(Task $task, $message){//reikia
-
+    public function getMessage(Task $task, Message $message){
+        
         $this->authorize('view', $task);
 
-        $message = Message::findOrFail($message);
+        if($task->id !== $message->task_id){
+            return response()->json(['msg' => 'forbidden'], 403);
+        }
+        $message = Message::findOrFail($message->id);
 
         event(new MessageWasViewed($message));
        
